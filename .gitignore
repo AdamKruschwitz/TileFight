@@ -5,3 +5,6 @@ phaser/
 .idea/**
 **.iml
 **.xml
+
+# Aseprite files
+**.aseprite
