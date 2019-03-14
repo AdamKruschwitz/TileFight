@@ -1,0 +1,7 @@
+# Phaser things
+phaser/
+
+# WebStorm things
+.idea/**
+**.iml
+**.xml
