@@ -12,7 +12,7 @@ class MainGameScene extends Phaser.Scene {
     three;
     four;
     space;
-    takeInput = true;
+    sidebarScene;
 
 
 
@@ -50,6 +50,7 @@ class MainGameScene extends Phaser.Scene {
         this.cameras.main.setBackgroundColor({r:255, g:255, b:255, a:255});
         this.scene.launch('sidebar');
 
+        // Set up player
         this.player = this.physics.add.sprite(50, 50, 'player');
         this.player.setCollideWorldBounds(true);
         this.player.setDataEnabled();
@@ -59,8 +60,7 @@ class MainGameScene extends Phaser.Scene {
         this.player.setData("move3", this.playerDefaultMove());
         this.player.setData("move4", this.playerDefaultMove());
 
-        console.log(this);
-
+        // Set up key controls
         this.up = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         this.down = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         this.left = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
@@ -70,14 +70,17 @@ class MainGameScene extends Phaser.Scene {
         this.three = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
         this.four = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FOUR);
         this.space = this.one = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        this.input.keyboard.enabled = true;
 
-
-
+        this.makeTilePickUp(0);
+        console.log(this);
+        this.sidebarScene = this.scene.get("sidebar");
+        console.log(this.sidebarScene);
 
     }
 
     update() {
-        if(this.takeInput) this.takePlayerInput();
+        this.takePlayerInput();
     }
 
     playerDefaultMove() {
@@ -120,21 +123,21 @@ class MainGameScene extends Phaser.Scene {
         // TODO - implement basic attack
     }
 
-    onTilePickup(tile) {
-        let tileType = tile.getData("tileType");
-        this.disableInput();
-        let sidebarScene = this.scene.get("sidebar");
-        sidebarScene.enableInput();
-        sidebarScene.pickupTile(tileType);
+    makeTilePickUp(type) {
+        console.log("creating pickup type " + type);
+        let tile = this.physics.add.sprite(200, 200, 'tilePickup');
+        tile.setDataEnabled();
+        tile.setData('type', type);
+        this.physics.add.overlap(this.player, tile, this.onTilePickup, function() {return true}, this);
     }
 
-    disableInput() {
-        console.log("disabling input from Main Game");
-        this.takeInput = false;
-    }
-
-    enableInput() {
-        console.log("enabling input from Main Game");
-        this.takeInput = true;
+    onTilePickup(player, tile) {
+        tile.destroy();
+        console.log(this);
+        this.sidebarScene.input.keyboard.enabled = true;
+        this.input.keyboard.enabled = false;
+        this.sidebarScene.pickupTile(tile);
+        this.player.setVelocity(0, 0);
+        console.log(this.sidebarScene);
     }
 }
