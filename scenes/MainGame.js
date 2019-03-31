@@ -133,11 +133,23 @@ class MainGameScene extends Phaser.Scene {
 
     onTilePickup(player, tile) {
         tile.destroy();
-        console.log(this);
+        //console.log(this);
+        this.player.setVelocity(0);
         this.sidebarScene.input.keyboard.enabled = true;
+        this.setAllKeysDownFalse();
         this.input.keyboard.enabled = false;
         this.sidebarScene.pickupTile(tile);
-        this.player.setVelocity(0, 0);
-        console.log(this.sidebarScene);
+        //console.log(this.sidebarScene);
+    }
+
+    setAllKeysDownFalse() {
+        this.one.isDown = false;
+        this.two.isDown = false;
+        this.three.isDown = false;
+        this.four.isDown = false;
+        this.up.isDown = false;
+        this.down.isDown = false;
+        this.left.isDown = false;
+        this.right.isDown = false;
     }
 }

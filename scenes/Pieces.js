@@ -10,7 +10,7 @@ class Piece {
     move;
 
     constructor(scene, spriteFileName, centerX, centerY, otherSquares, x, y, positionX, positionY, move) {
-        console.log(scene);
+        //console.log(scene);
         this.scene = scene;
         this.sprite = this.scene.physics.add.sprite(x, y, spriteFileName);
         this.centerX = centerX;
@@ -20,10 +20,55 @@ class Piece {
         this.positionY = positionY;
         this.move = move;
         this.sprite.setOrigin(5/6, 0.75);
+        console.log(otherSquares);
+    }
+
+    turnClockwise() {
+        // Check if the piece can be turned in bounds
+        let ableToTurn = true;
+        this.otherSquares.forEach(function(point, context) {
+            let newX = -point[1] + context.positionX;
+            let newY = point[0] + context.positionY;
+            if(newX >= 4 || newX < 0) ableToTurn = false;
+            if(newY >= 4 || newY < 0) ableToTurn = false;
+        }, this);
+
+        // Turn the squares
+        this.otherSquares.forEach(function(point) {
+            //console.log(point);
+            let temp = point[0];
+            point[0] = -point[1];   // X = -Y
+            point[1] = temp;        // Y = X
+            //console.log(point);
+        });
+
+        this.sprite.angle += 90;
+        console.log(this.otherSquares);
+    }
+
+    turnCounterclockwise() {
+        // Check if the piece can be turned in bounds
+        let ableToTurn = true;
+        this.otherSquares.forEach(function(point, context) {
+            let newX = point[1] + context.positionX;
+            let newY = -point[0] + context.positionY;
+            if(newX >= 4 || newX < 0) ableToTurn = false;
+            if(newY >= 4 || newY < 0) ableToTurn = false;
+        }, this);
+
+        // Turn the piece
+        this.otherSquares.forEach(function(point) {
+            let temp = point[0];
+            point[0] = point[1];    // X = Y
+            point[1] = -temp;       // Y = -X
+        });
+
+        this.sprite.angle -= 90;
+        console.log(this.otherSquares);
     }
 
     moveLeft() {
-        console.log('moving left');
+        //console.log('moving left');
         if(!(this.leftMostSquareOffset() + this.positionX - 1 < 0)) {
             this.positionX--;
             // TODO Move sprite one to the left
@@ -32,7 +77,7 @@ class Piece {
     }
 
     moveRight() {
-        console.log('moving right');
+        //console.log('moving right');
         if(!(this.rightMostSquareOffset() + this.positionX + 1 >= 4)) {
             this.positionX++;
             // TODO Move sprite one to the right
@@ -41,7 +86,7 @@ class Piece {
     }
 
     moveUp() {
-        console.log('moving up');
+        //console.log('moving up');
         if(!(this.topMostSquareOffset() + this.positionY - 1 < 0)) {
             this.positionY--;
             // TODO Move sprite one up
@@ -50,7 +95,7 @@ class Piece {
     }
 
     moveDown() {
-        console.log('moving down');
+        //console.log('moving down');
         if(!(this.bottomMostSquareOffset() + this.positionY + 1 >= 4)) {
             this.positionY++;
             // TODO Move sprite one down
@@ -65,7 +110,7 @@ class Piece {
                 xMin = square[0]
             }
         });
-        console.log(xMin);
+        //console.log(xMin);
         return xMin;
     }
 
@@ -76,7 +121,7 @@ class Piece {
                 xMax = square[0];
             }
         });
-        console.log(xMax);
+        //console.log(xMax);
         return xMax;
     }
 
@@ -87,7 +132,7 @@ class Piece {
                 yMin = square[1]
             }
         });
-        console.log(yMin);
+        //console.log(yMin);
         return yMin;
     }
 
@@ -100,6 +145,10 @@ class Piece {
         });
         //console.log(yMax);
         return yMax;
+    }
+
+    destroySprite() {
+        this.sprite.destroy();
     }
 
     static defaultMove() {
