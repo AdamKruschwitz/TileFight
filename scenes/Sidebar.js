@@ -175,7 +175,7 @@ class SidebarScene extends Phaser.Scene {
                     this.input.keyboard.enabled = false;
                     this.setAllKeysDownFalse();
                     this.activePiece = null;
-                    this.mainGameScene.makeTilePickUp(0);
+                    //this.mainGameScene.makeTilePickUp(0); DEBUG
                 }
                 else { // Pick up the overlapping tile and place the current active tile
                     let temp = this.activePiece;

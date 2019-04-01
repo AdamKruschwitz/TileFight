@@ -1,5 +1,11 @@
+const UP = 0;
+const RIGHT = 1;
+const DOWN = 2;
+const LEFT = 3;
+
 class MainGameScene extends Phaser.Scene {
 
+    enemies;
     player;
     spacePressed = false;
     playerSpeed = 300;
@@ -13,6 +19,7 @@ class MainGameScene extends Phaser.Scene {
     four;
     space;
     sidebarScene;
+    lastDirection = UP;
 
 
 
@@ -42,6 +49,7 @@ class MainGameScene extends Phaser.Scene {
     preload() {
         this.load.image('player', 'assets/black50.png');
         this.load.image('tilePickup', 'assets/circle20.png');
+        this.load.image('hitbox', 'assets/black50.png');
     }
 
     create() {
@@ -51,14 +59,7 @@ class MainGameScene extends Phaser.Scene {
         this.scene.launch('sidebar');
 
         // Set up player
-        this.player = this.physics.add.sprite(50, 50, 'player');
-        this.player.setCollideWorldBounds(true);
-        this.player.setDataEnabled();
-        this.player.setData("tiles", []);
-        this.player.setData("move1", this.playerDefaultMove());
-        this.player.setData("move2", this.playerDefaultMove());
-        this.player.setData("move3", this.playerDefaultMove());
-        this.player.setData("move4", this.playerDefaultMove());
+        this.player = new Player(this, 'player', 5);
 
         // Set up key controls
         this.up = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
@@ -72,10 +73,16 @@ class MainGameScene extends Phaser.Scene {
         this.space = this.one = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.input.keyboard.enabled = true;
 
-        this.makeTilePickUp(0);
+        this.makeTilePickUp(0, 200, 200);
         console.log(this);
         this.sidebarScene = this.scene.get("sidebar");
         console.log(this.sidebarScene);
+
+        this.enemies = this.physics.add.group({
+            collideWorldBounds: true
+        });
+
+        this.makeEnemy(300, 300);
 
     }
 
@@ -96,45 +103,50 @@ class MainGameScene extends Phaser.Scene {
         //console.log(this.right + this.left);
 
         if(Math.abs(horizontalDirection) + Math.abs(verticalDirection) > 1)  diagonalHinder = Math.SQRT2;
-        this.player.setVelocityX(this.playerSpeed * horizontalDirection / diagonalHinder);
-        this.player.setVelocityY(this.playerSpeed * verticalDirection / diagonalHinder);
+        this.player.sprite.setVelocityX(this.playerSpeed * horizontalDirection / diagonalHinder);
+        this.player.sprite.setVelocityY(this.playerSpeed * verticalDirection / diagonalHinder);
 
 
         // Attacks
         if(this.space.isDown && !this.spacePressed) {
             this.spacePressed = true;
-            this.playerBasicAttack();
+            this.player.basicAttack();
         }
         else if(this.space.isUp && this.spacePressed) {
             this.spacePressed = false;
         }
+
+        // Get last direction
+        if(this.up.isDown) this.lastDirection = UP;
+        else if(this.right.isDown) this.lastDirection = RIGHT;
+        else if(this.down.isDown) this.lastDirection = DOWN;
+        else if(this.left.isDown) this.lastDirection = LEFT;
+
     }
 
-    createTilePickup() {
-        let tilePickup = this.physics.add.sprite(50, 50, 'tilePickup');
-        tilePickup.setDataEnabled();
+    makeRandomTilePickup(x, y) {
         let tileType = Math.floor(Math.random() * 4);
-        tilePickup.setData("tileType", tileType);
-
+        let tile = this.makeTilePickUp(tileType);
+        return tile;
     }
 
-    playerBasicAttack() {
-        console.log("basicAttack attacks");
-        // TODO - implement basic attack
-    }
-
-    makeTilePickUp(type) {
+    makeTilePickUp(type, x, y) {
         console.log("creating pickup type " + type);
-        let tile = this.physics.add.sprite(200, 200, 'tilePickup');
+        let tile = this.physics.add.sprite(x, y, 'tilePickup');
         tile.setDataEnabled();
         tile.setData('type', type);
-        this.physics.add.overlap(this.player, tile, this.onTilePickup, function() {return true}, this);
+        this.physics.add.overlap(this.player.sprite, tile, this.onTilePickup, function() {return true}, this);
+        return tile;
+    }
+
+    makeEnemy(x, y) {
+        return new Enemy(this, this.enemies, 'player', 3, x, y);
     }
 
     onTilePickup(player, tile) {
         tile.destroy();
         //console.log(this);
-        this.player.setVelocity(0);
+        this.player.sprite.setVelocity(0);
         this.sidebarScene.input.keyboard.enabled = true;
         this.setAllKeysDownFalse();
         this.input.keyboard.enabled = false;
@@ -152,4 +164,6 @@ class MainGameScene extends Phaser.Scene {
         this.left.isDown = false;
         this.right.isDown = false;
     }
+
+
 }

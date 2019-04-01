@@ -33,17 +33,19 @@ class Piece {
             if(newY >= 4 || newY < 0) ableToTurn = false;
         }, this);
 
-        // Turn the squares
-        this.otherSquares.forEach(function(point) {
-            //console.log(point);
-            let temp = point[0];
-            point[0] = -point[1];   // X = -Y
-            point[1] = temp;        // Y = X
-            //console.log(point);
-        });
+        if(ableToTurn) {
+            // Turn the squares
+            this.otherSquares.forEach(function (point) {
+                //console.log(point);
+                let temp = point[0];
+                point[0] = -point[1];   // X = -Y
+                point[1] = temp;        // Y = X
+                //console.log(point);
+            });
 
-        this.sprite.angle += 90;
-        console.log(this.otherSquares);
+            this.sprite.angle += 90;
+            console.log(this.otherSquares);
+        }
     }
 
     turnCounterclockwise() {
@@ -57,14 +59,16 @@ class Piece {
         }, this);
 
         // Turn the piece
-        this.otherSquares.forEach(function(point) {
-            let temp = point[0];
-            point[0] = point[1];    // X = Y
-            point[1] = -temp;       // Y = -X
-        });
+        if(ableToTurn) {
+            this.otherSquares.forEach(function (point) {
+                let temp = point[0];
+                point[0] = point[1];    // X = Y
+                point[1] = -temp;       // Y = -X
+            });
 
-        this.sprite.angle -= 90;
-        console.log(this.otherSquares);
+            this.sprite.angle -= 90;
+            console.log(this.otherSquares);
+        }
     }
 
     moveLeft() {
