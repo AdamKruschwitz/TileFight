@@ -84,6 +84,8 @@ class MainGameScene extends Phaser.Scene {
 
         this.makeEnemy(300, 300);
 
+        //this.scene.pause();
+
     }
 
     update() {
@@ -165,5 +167,37 @@ class MainGameScene extends Phaser.Scene {
         this.right.isDown = false;
     }
 
+    // updateEnemies() {
+    //     this.enemies.children.iterate(this.enemyFindState);
+    //     this.enemies.children.iterate(function(child) {
+    //         switch(child.getData("state")) {
+    //             case "follow":
+    //                 this.physics.moveToObject(child, player, enemySpeed);
+    //                 break;
+    //
+    //             case "idle":
+    //                 child.setVelocity(0, 0);
+    //                 break;
+    //             case "attack":
+    //                 enemyBasicAttack.call(this, child);
+    //                 child.setData("state", "afterAttack");
+    //                 child.setVelocity(0, 0);
+    //                 console.log("enemy in attack");
+    //                 break;
+    //             case "afterAttack":
+    //                 // After a bit, change back to idle
+    //                 let timedEvent = this.time.delayedCall(attackResetTime, function(enemy) {
+    //                     enemy.setData("state", "idle");
+    //                 }, [child], this);
+    //                 child.setData("state", "runAway");
+    //                 break;
+    //             case "runAway":
+    //                 let angle = Phaser.Math.Angle.BetweenPoints(player, child);
+    //                 this.physics.velocityFromRotation(angle, enemySpeed);
+    //                 break;
+    //
+    //         }
+    //     }, this);
+    // }
 
 }

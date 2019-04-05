@@ -70,6 +70,8 @@ class SidebarScene extends Phaser.Scene {
         // Get a reference to the main scene
         this.mainGameScene = this.scene.get("mainGame");
         console.log("mainGameScene: " + this.mainGameScene);
+
+        //this.scene.pause();
     }
 
     update() {
