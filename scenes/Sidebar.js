@@ -16,15 +16,8 @@ class SidebarScene extends Phaser.Scene {
     two;
     three;
     four;
-    upPressed = false;
-    downPressed = false;
-    leftPressed = false;
-    rightPressed = false;
-    onePressed = false;
-    twoPressed = false;
-    threePressed = false;
-    fourPressed = false;
     activePiece;
+    thisScene;
 
 
 
@@ -56,6 +49,9 @@ class SidebarScene extends Phaser.Scene {
         this.scene.bringToTop();
         this.add.sprite(0, 0, 'sidebarBackground').setOrigin(0);
 
+        // Keep track of context
+        this.thisScene = this;
+
         // Set up controls
         this.up = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         this.down = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
@@ -80,62 +76,38 @@ class SidebarScene extends Phaser.Scene {
 
     takePlayerInput() {
         // UP
-        if(this.up.isDown && !this.upPressed) {
-            this.upPressed = true;
+        if(Phaser.Input.Keyboard.JustDown(this.up)) {
             this.activePiece.moveUp();
-        }
-        else if(this.up.isUp && this.upPressed) {
-            this.upPressed = false;
         }
 
         // DOWN
-        if(this.down.isDown && !this.downPressed) {
-            this.downPressed = true;
+        if(Phaser.Input.Keyboard.JustDown(this.down)) {
             this.activePiece.moveDown();
-        }
-        else if(this.down.isUp && this.downPressed) {
-            this.downPressed = false;
         }
 
         // LEFT
-        if(this.left.isDown && !this.leftPressed) {
-            this.leftPressed = true;
+        if(Phaser.Input.Keyboard.JustDown(this.left)) {
             this.activePiece.moveLeft();
-        }
-        else if(this.left.isUp && this.leftPressed) {
-            this.leftPressed = false;
         }
 
         // RIGHT
-        if(this.right.isDown && !this.rightPressed) {
-            this.rightPressed = true;
+        if(Phaser.Input.Keyboard.JustDown(this.right)) {
             this.activePiece.moveRight();
-        }
-        else if(this.right.isUp && this.rightPressed) {
-            this.rightPressed = false;
         }
 
         // ONE - turn counterclockwise
-        if(this.one.isDown && !this.onePressed) {
-            this.onePressed = true;
+        if(Phaser.Input.Keyboard.JustDown(this.one)) {
             this.activePiece.turnCounterclockwise();
-        }
-        else if(this.one.isUp && this.onePressed) {
-            this.onePressed = false;
         }
 
         // TWO - turn clockwise
-        if(this.two.isDown && !this.twoPressed) {
-            this.twoPressed = true;
+        if(Phaser.Input.Keyboard.JustDown(this.two)) {
             this.activePiece.turnClockwise();
-        }
-        else if(this.two.isUp && this.twoPressed) {
-            this.twoPressed = false;
         }
 
         // THREE - place/switch tiles
-        if(this.three.isDown && !this.threePressed) {
-            this.threePressed = true;
+        if(Phaser.Input.Keyboard.JustDown(this.three)) {
+
             // Get a 2d array of square positions, set the otherSquares squares to be their actual grid positions
             // as opposed to their relative positions
             let squares = [
@@ -202,12 +174,9 @@ class SidebarScene extends Phaser.Scene {
                 }
             }
         }
-        else if(this.three.isUp && this.threePressed) {
-            this.threePressed = false;
-        }
 
         // FOUR - return to main game and discard active piece
-        if(this.four.isDown && !this.fourPressed) {
+        if(Phaser.Input.Keyboard.JustDown(this.four)) {
             this.fourPressed = true;
 
         // TODO - save the discarded piece somehow?
@@ -217,16 +186,17 @@ class SidebarScene extends Phaser.Scene {
             this.input.keyboard.enabled = false;
             this.setAllKeysDownFalse();
         }
-        else if(this.four.isUp && this.fourPressed) {
-            this.fourPressed = false;
-        }
-
 
     }
 
     pickupTile(tileType) {
         //TODO - implement tile type
-        this.activePiece = new Piece(this, 'LPiece', 146, 98, [[0, -1], [-1, 0], [-2, 0]], 156, 284, 2, 1, Piece.defaultMove);
+        switch(tileType) {
+            case 0:
+                this.activePiece = new Piece(this, 'LPiece', 146, 98, [[0, -1], [-1, 0], [-2, 0]], 156, 284, 2, 1, this.mainGameScene.bigHit);
+                break;
+        }
+        //this.activePiece = new Piece(this, 'LPiece', 146, 98, [[0, -1], [-1, 0], [-2, 0]], 156, 284, 2, 1, Piece.defaultMove);
     }
 
     cloneArray(array) {

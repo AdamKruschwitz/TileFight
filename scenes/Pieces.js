@@ -159,31 +159,4 @@ class Piece {
         console.log("activating default move");
     }
 
-    bigHit() {
-        let x = this.scene.player.sprite.x;
-        let y = this.scene.player.sprite.y;
-        let lastDirection = this.scene.lastDirection;
-
-        let xOffset, yOffset;
-        switch(lastDirection) {
-            case UP:
-                yOffset = -205;
-                break;
-
-            case RIGHT:
-                xOffset = 205;
-                break;
-
-            case DOWN:
-                yOffset = 205;
-                break;
-
-            case LEFT:
-                xOffset = -205;
-                break;
-        }
-
-        this.scene.makeHitbox(x+xOffset, y+yOffset, 400, 50, this.scene.enemies, this.scene.player.onBasicAttackHit, this.scene);
-    }
-
 }

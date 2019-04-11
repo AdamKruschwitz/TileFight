@@ -7,7 +7,6 @@ class MainGameScene extends Phaser.Scene {
 
     enemies;
     player;
-    spacePressed = false;
     playerSpeed = 300;
     up;
     down;
@@ -19,6 +18,7 @@ class MainGameScene extends Phaser.Scene {
     four;
     space;
     sidebarScene;
+    thisScene;
     lastDirection = UP;
 
 
@@ -58,6 +58,9 @@ class MainGameScene extends Phaser.Scene {
         this.cameras.main.setBackgroundColor({r:255, g:255, b:255, a:255});
         this.scene.launch('sidebar');
 
+        // keep track of context
+        this.thisScene = this;
+
         // Set up player
         this.player = new Player(this, 'player', 5);
 
@@ -66,7 +69,7 @@ class MainGameScene extends Phaser.Scene {
         this.down = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         this.left = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         this.right = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
-        this.one = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
+        this.one = this.input.keyboard.addKey('1');
         this.two = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
         this.three = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
         this.four = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FOUR);
@@ -83,6 +86,8 @@ class MainGameScene extends Phaser.Scene {
         });
 
         this.makeEnemy(300, 300);
+
+        this.setUpInput();
 
         //this.scene.pause();
 
@@ -108,14 +113,41 @@ class MainGameScene extends Phaser.Scene {
         this.player.sprite.setVelocityX(this.playerSpeed * horizontalDirection / diagonalHinder);
         this.player.sprite.setVelocityY(this.playerSpeed * verticalDirection / diagonalHinder);
 
-
         // Attacks
-        if(this.space.isDown && !this.spacePressed) {
-            this.spacePressed = true;
+        if(Phaser.Input.Keyboard.JustDown(this.space)) {
             this.player.basicAttack();
         }
-        else if(this.space.isUp && this.spacePressed) {
-            this.spacePressed = false;
+
+        // ONE - first piece move
+        if(Phaser.Input.Keyboard.JustDown(this.one)) {
+            console.log('onePressed');
+            if(this.sidebarScene.pieces.length > 0) {
+                this.sidebarScene.pieces[0].move();
+            }
+        }
+
+        // TWO - second piece move
+        if(Phaser.Input.Keyboard.JustDown(this.two)) {
+            this.twoPressed = true;
+            if(this.sidebarScene.pieces.length > 1) {
+                this.sidebarScene.pieces[1].move();
+            }
+        }
+
+        // THREE - third piece move
+        if(Phaser.Input.Keyboard.JustDown(this.three)) {
+            this.threePressed = true;
+            if(this.sidebarScene.pieces.length > 2) {
+                this.sidebarScene.pieces[2].move();
+            }
+        }
+
+        // FOUR - first piece move
+        if(Phaser.Input.Keyboard.JustDown(this.four)) {
+            this.fourPressed = true;
+            if(this.sidebarScene.pieces.length > 3) {
+                this.sidebarScene.pieces[3].move();
+            }
         }
 
         // Get last direction
@@ -136,7 +168,7 @@ class MainGameScene extends Phaser.Scene {
         console.log("creating pickup type " + type);
         let tile = this.physics.add.sprite(x, y, 'tilePickup');
         tile.setDataEnabled();
-        tile.setData('type', type);
+        tile.setData('tileType', type);
         this.physics.add.overlap(this.player.sprite, tile, this.onTilePickup, function() {return true}, this);
         return tile;
     }
@@ -146,13 +178,14 @@ class MainGameScene extends Phaser.Scene {
     }
 
     onTilePickup(player, tile) {
+        let tileType = tile.getData('tileType');
         tile.destroy();
         //console.log(this);
         this.player.sprite.setVelocity(0);
         this.sidebarScene.input.keyboard.enabled = true;
         this.setAllKeysDownFalse();
         this.input.keyboard.enabled = false;
-        this.sidebarScene.pickupTile(tile);
+        this.sidebarScene.pickupTile(tileType);
         //console.log(this.sidebarScene);
     }
 
@@ -165,6 +198,142 @@ class MainGameScene extends Phaser.Scene {
         this.down.isDown = false;
         this.left.isDown = false;
         this.right.isDown = false;
+    }
+
+    /*
+    /------------------------------\
+    | NOTE: The move code is run   |
+    |  is run from the Piece object|
+    |  To reference the main game  |
+    |  use this.scene.mainGameScene|
+    \------------------------------/
+     */
+    bigHit() {
+        let x = this.scene.mainGameScene.player.sprite.x;
+        let y = this.scene.mainGameScene.player.sprite.y;
+
+        let xOffset=0, yOffset=0;
+        switch(this.scene.mainGameScene.lastDirection) {
+            case UP:
+                yOffset = -205;
+                break;
+
+            case RIGHT:
+                xOffset = 205;
+                break;
+
+            case DOWN:
+                yOffset = 205;
+                break;
+
+            case LEFT:
+                xOffset = -205;
+                break;
+        }
+
+        this.scene.mainGameScene.player.makeHitbox(x+xOffset, y+yOffset, 400, 50, this.scene.mainGameScene.enemies, this.scene.mainGameScene.player.onBasicAttackHit, this.scene.mainGameScene);
+    }
+
+    tripleHit() {
+        let x = this.scene.mainGameScene.player.sprite.x;
+        let y = this.scene.mainGameScene.player.sprite.y;
+
+        let xOffset = 0, yOffset = 0;
+        switch(this.scene.mainGameScene.lastDirection) {
+            case UP:
+                yOffset = -55;
+                break;
+
+            case RIGHT:
+                xOffset = 55;
+                break;
+
+            case DOWN:
+                yOffset = 55;
+                break;
+
+            case LEFT:
+                xOffset = -55;
+                break;
+        }
+
+        this.scene.mainGameScene.player.makeHitbox(x+xOffset, y+yOffset, 50, 50, this.scene.mainGameScene.enemies, this.scene.mainGameScene.player.onBasicAttackHit, this.scene.mainGameScene);
+        this.scene.mainGameScene.time.delayedCall(200, function() {
+            this.player.makeHitbox(x+xOffset*2, y+yOffset*2, 50, 50, this.enemies, this.player.onBasicAttackHit, this);
+        }, this.scene.mainGameScene);
+        this.scene.mainGameScene.time.delayedCall(400, function() {
+            this.player.makeHitbox(x+xOffset*3, y+yOffset*3, 50, 50, this.enemies, this.player.onBasicAttackHit, this);
+        }, this.scene.mainGameScene);
+    }
+
+    /**
+     * Teleport the player some distance in a direction then
+     */
+    rightBehindYou() {
+        let teleportDistance = 200;
+        let x = this.scene.mainGameScene.player.x;
+        let y = this.scene.mainGameScene.player.y;
+
+        let xPlayerOffset = 0, yPlayerOffset = 0;
+        let xOffset = 0, yOffset = 0;
+        switch(this.scene.mainGameScene.lastDirection) {
+            case UP:
+                yOffset = 55;
+                yPlayerOffset = -teleportDistance;
+                break;
+
+            case RIGHT:
+                xOffset = -55;
+                xPlayerOffset = teleportDistance;
+                break;
+
+            case DOWN:
+                yOffset = -55;
+                yPlayerOffset = teleportDistance;
+                break;
+
+            case LEFT:
+                xOffset = 55;
+                xPlayerOffset = -teleportDistance;
+                break;
+        }
+
+        this.scene.mainGameScene.player.x = x+xPlayerOffset;
+        this.scene.mainGameScene.player.y = y+yPlayerOffset;
+
+        this.scene.mainGameScene.player.makeHitbox(x+xOffset, y+yOffset, 50, 50, this.scene.mainGameScene.enemies, this.scene.mainGameScene.player.onBasicAttackHit, this.scene.mainGameScene);
+    }
+
+    setUpInput() {
+        this.input.keyboard.on('keydown', (event) => {
+            let digit;
+            switch(event.code) {
+                case 'Digit1':
+                case 'Numpad1':
+                    console.log('1 pressed');
+                    digit = 1;
+                    break;
+                case 'Digit2':
+                case 'Numpad2':
+                    console.log('2 Pressed');
+                    digit = 2;
+                    break;
+                case 'Digit3':
+                case 'Numpad3':
+                    console.log('3 Pressed');
+                    digit = 3;
+                    break;
+                case 'Digit4':
+                case 'Numpad4':
+                    console.log('4 Pressed');
+                    digit = 4;
+                    break;
+            }
+            if(this.sidebarScene.pieces.length > digit-1) {
+                this.sidebarScene.pieces[digit-1].move();
+            }
+
+        });
     }
 
     // updateEnemies() {

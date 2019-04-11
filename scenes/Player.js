@@ -46,7 +46,7 @@ class Player {
     }
 
     makeHitbox(x, y, size, time, object, callback, context) {
-        console.log("Making Hitbox");
+        console.log("Making Hitbox at: " + x + ", "+ y);
         let hitbox = this.scene.add.zone(x, y).setSize(size, size, true);
         hitbox.setOrigin();
         this.scene.physics.world.enable(hitbox);
