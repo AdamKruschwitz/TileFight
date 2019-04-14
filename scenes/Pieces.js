@@ -8,6 +8,7 @@ class Piece {
     positionX;
     positionY;
     move;
+    onCooldown = false;
 
     constructor(scene, spriteFileName, centerX, centerY, otherSquares, x, y, positionX, positionY, move) {
         //console.log(scene);

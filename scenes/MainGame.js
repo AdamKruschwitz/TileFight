@@ -50,6 +50,8 @@ class MainGameScene extends Phaser.Scene {
         this.load.image('player', 'assets/black50.png');
         this.load.image('tilePickup', 'assets/circle20.png');
         this.load.image('hitbox', 'assets/black50.png');
+        //this.load.image('tileset', 'assets/tileset.png');
+        //this.load.json('level', 'assets/levelData.json');
     }
 
     create() {
@@ -90,6 +92,12 @@ class MainGameScene extends Phaser.Scene {
         this.setUpInput();
 
         //this.scene.pause();
+
+        // Load in the level
+        let level = this.cache.json.get('level');
+        const map = this.make.tilemap({data: level, tileWidth: 16, tileHeight: 16});
+        const tiles = map.addTilesetImage("mario-tiles");
+        const layer = map.createStaticLayer(0, tiles, 0, 0);
 
     }
 
@@ -336,6 +344,19 @@ class MainGameScene extends Phaser.Scene {
         });
     }
 
+    enemyFindState(child) {
+        let enemy = child.getData("parent");
+        if(enemy.state != "afterAttack") {
+            if (Phaser.Math.Distance.Between(child.x, child.y, enemy.scene.mainGameScene.x, player.y) < attackThreshold) {
+                child.setData("state", "attack");
+            } else if (Phaser.Math.Distance.Between(child.x, child.y, player.x, player.y) < followThreshold) {
+                child.setData("state", "follow");
+            } else {
+                child.setData("state", "idle");
+            }
+        }
+    }
+
     // updateEnemies() {
     //     this.enemies.children.iterate(this.enemyFindState);
     //     this.enemies.children.iterate(function(child) {
@@ -348,7 +369,7 @@ class MainGameScene extends Phaser.Scene {
     //                 child.setVelocity(0, 0);
     //                 break;
     //             case "attack":
-    //                 enemyBasicAttack.call(this, child);
+    //                 //enemyBasicAttack.call(this, child);
     //                 child.setData("state", "afterAttack");
     //                 child.setVelocity(0, 0);
     //                 console.log("enemy in attack");
@@ -362,7 +383,7 @@ class MainGameScene extends Phaser.Scene {
     //                 break;
     //             case "runAway":
     //                 let angle = Phaser.Math.Angle.BetweenPoints(player, child);
-    //                 this.physics.velocityFromRotation(angle, enemySpeed);
+    //                 //this.physics.velocityFromRotation(angle, enemySpeed);
     //                 break;
     //
     //         }
