@@ -12,6 +12,7 @@
     <script src="scenes/Sidebar.js"></script>
     <script src="scenes/GameOver.js"></script>
     <script src="scenes/StartMenu.js"></script>
+    <script src="scenes/UI.js"></script>
 </head>
 <body>
     <script>
@@ -22,7 +23,7 @@
             width	: 800,		// 576
             height	: 600,		// 960
             parent	: 'phaser-app',
-            scene	: [StartMenu, MainGameScene, SidebarScene, GameOver],
+            scene	: [StartMenu, MainGameScene, SidebarScene, UI, GameOver],
             title	: 'TileFight'
         };
 

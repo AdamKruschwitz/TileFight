@@ -19,6 +19,7 @@ class MainGameScene extends Phaser.Scene {
     five;
     space;
     sidebarScene;
+    UIScene;
     thisScene;
     lastDirection = UP;
 
@@ -90,6 +91,7 @@ class MainGameScene extends Phaser.Scene {
         console.log(this);
         this.sidebarScene = this.scene.get("sidebar");
         console.log(this.sidebarScene);
+        this.UIScene = this.scene.get('UI');
 
         this.enemies = this.physics.add.group({
             collideWorldBounds: true
@@ -124,6 +126,7 @@ class MainGameScene extends Phaser.Scene {
             this.scene.start('gameOver');
             this.scene.remove();
             this.sidebarScene.scene.remove();
+            this.UIScene.scene.remove();
         }
     }
 
@@ -208,13 +211,11 @@ class MainGameScene extends Phaser.Scene {
     onTilePickup(player, tile) {
         let tileType = tile.getData('tileType');
         tile.destroy();
-        //console.log(this);
         this.player.sprite.setVelocity(0);
         this.sidebarScene.input.keyboard.enabled = true;
         this.setAllKeysDownFalse();
         this.input.keyboard.enabled = false;
         this.sidebarScene.pickupTile(tileType);
-        //console.log(this.sidebarScene);
     }
 
     setAllKeysDownFalse() {
@@ -364,7 +365,11 @@ class MainGameScene extends Phaser.Scene {
                     break;
             }
             if(this.sidebarScene.pieces.length > digit-1) {
-                this.sidebarScene.pieces[digit-1].move();
+                if(!this.sidebarScene.pieces[digit-1].onCooldown) {
+                    this.sidebarScene.pieces[digit - 1].move();
+                    this.sidebarScene.pieces[digit - 1].onCooldown = true;
+                    this.events.emit('moveUsed', [digit, this.sidebarScene.pieces[digit - 1].cooldown]);
+                }
             }
 
         });

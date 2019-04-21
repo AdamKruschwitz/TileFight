@@ -30,6 +30,7 @@ class StartMenu extends Phaser.Scene {
         if(this.space.isDown && !this.spacePressed) {
             this.scene.start('mainGame');
             this.scene.start('sidebar');
+            this.scene.start('UI');
             this.input.keyboard.enabled = false;
             this.spacePressed = true;
         }

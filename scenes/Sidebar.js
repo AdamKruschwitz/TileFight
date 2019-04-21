@@ -193,7 +193,7 @@ class SidebarScene extends Phaser.Scene {
         //TODO - implement tile type
         switch(tileType) {
             case 0:
-                this.activePiece = new Piece(this, 'LPiece', 146, 98, [[0, -1], [-1, 0], [-2, 0]], 156, 284, 2, 1, this.mainGameScene.bigHit);
+                this.activePiece = new Piece(this, 'LPiece', 146, 98, [[0, -1], [-1, 0], [-2, 0]], 156, 284, 2, 1, this.mainGameScene.bigHit, 6000);
                 break;
         }
         //this.activePiece = new Piece(this, 'LPiece', 146, 98, [[0, -1], [-1, 0], [-2, 0]], 156, 284, 2, 1, Piece.defaultMove);

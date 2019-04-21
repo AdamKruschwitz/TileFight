@@ -9,8 +9,9 @@ class Piece {
     positionY;
     move;
     onCooldown = false;
+    cooldown;
 
-    constructor(scene, spriteFileName, centerX, centerY, otherSquares, x, y, positionX, positionY, move) {
+    constructor(scene, spriteFileName, centerX, centerY, otherSquares, x, y, positionX, positionY, move, cooldown) {
         //console.log(scene);
         this.scene = scene;
         this.sprite = this.scene.physics.add.sprite(x, y, spriteFileName);
@@ -21,6 +22,7 @@ class Piece {
         this.positionY = positionY;
         this.move = move;
         this.sprite.setOrigin(5/6, 0.75);
+        this.cooldown = cooldown;
         console.log(otherSquares);
     }
 
