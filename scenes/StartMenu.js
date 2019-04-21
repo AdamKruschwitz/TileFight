@@ -3,6 +3,23 @@ class StartMenu extends Phaser.Scene {
     space;
     spacePressed = false;
 
+    constructor() {
+        super({
+            key: "startMenu"
+
+            /*
+            BUG: this doesn't load the input plugin :(
+            plugins: [
+                'Loader',
+                'Input',
+                'TweenManager',
+                'DataManager',
+                'Clock'
+            ]
+            */
+        });
+    }
+
     create() {
         this.space = this.one = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 

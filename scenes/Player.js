@@ -7,6 +7,7 @@ class Player {
     move3;
     move4;
     basicAttack;
+    score = 0;
 
     constructor(scene, spriteFileName, startingHealth) {
         this.scene = scene;
@@ -14,6 +15,7 @@ class Player {
         this.sprite = this.scene.physics.add.sprite(50, 50, 'player');
         this.sprite.setCollideWorldBounds(true);
         this.sprite.setDataEnabled();
+        this.sprite.setDrag(1000, 1000);
         this.sprite.setData('parent', this);
         this.basicAttack = this.playerBasicAttack;
     }
@@ -67,6 +69,7 @@ class Player {
             if(object.getData('parent').health <= 0) {
                 this.makeTilePickUp(0, object.x, object.y);
                 object.destroy();
+                this.score += 100;
             }
             hitbox.getData("alreadyHit").push(object);
         }

@@ -16,6 +16,7 @@ class MainGameScene extends Phaser.Scene {
     two;
     three;
     four;
+    five;
     space;
     sidebarScene;
     thisScene;
@@ -50,8 +51,8 @@ class MainGameScene extends Phaser.Scene {
         this.load.image('player', 'assets/black50.png');
         this.load.image('tilePickup', 'assets/circle20.png');
         this.load.image('hitbox', 'assets/black50.png');
-        //this.load.image('tileset', 'assets/tileset.png');
-        //this.load.json('level', 'assets/levelData.json');
+        this.load.image('tileset', 'assets/test_tileset.png');
+        this.load.json('level', 'assets/level1.json');
     }
 
     create() {
@@ -59,6 +60,12 @@ class MainGameScene extends Phaser.Scene {
         this.cameras.main.setViewport(266, 0, 534, 600);
         this.cameras.main.setBackgroundColor({r:255, g:255, b:255, a:255});
         this.scene.launch('sidebar');
+
+        // Load in the level
+        let level = this.cache.json.get('level');
+        const map = this.make.tilemap({data: level["map"], tileWidth: 64, tileHeight: 64});
+        const tiles = map.addTilesetImage("tileset");
+        const layer = map.createStaticLayer(0, tiles, 0, 0);
 
         // keep track of context
         this.thisScene = this;
@@ -75,10 +82,11 @@ class MainGameScene extends Phaser.Scene {
         this.two = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
         this.three = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
         this.four = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FOUR);
+        this.four = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FIVE);
         this.space = this.one = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.input.keyboard.enabled = true;
 
-        this.makeTilePickUp(0, 200, 200);
+        //this.makeTilePickUp(0, 200, 200);
         console.log(this);
         this.sidebarScene = this.scene.get("sidebar");
         console.log(this.sidebarScene);
@@ -88,25 +96,35 @@ class MainGameScene extends Phaser.Scene {
         });
 
         this.makeEnemy(300, 300);
+        this.makeEnemy(100, 300);
+        this.makeEnemy(300, 100);
 
         this.setUpInput();
 
         //this.scene.pause();
 
-        // Load in the level
-        let level = this.cache.json.get('level');
-        const map = this.make.tilemap({data: level, tileWidth: 16, tileHeight: 16});
-        const tiles = map.addTilesetImage("mario-tiles");
-        const layer = map.createStaticLayer(0, tiles, 0, 0);
+        this.cameras.main.startFollow(this.player.sprite);
 
     }
 
     update() {
         this.takePlayerInput();
+        this.checkPlayerAlive();
+        this.enemies.children.iterate(function(child) {
+            child.getData("parent").updateEnemy();
+        });
     }
 
     playerDefaultMove() {
         console.log("No move selected");
+    }
+
+    checkPlayerAlive() {
+        if(this.player.health <= 0) {
+            this.scene.start('gameOver');
+            this.scene.remove();
+            this.sidebarScene.scene.remove();
+        }
     }
 
     takePlayerInput() {
@@ -118,8 +136,10 @@ class MainGameScene extends Phaser.Scene {
         //console.log(this.right + this.left);
 
         if(Math.abs(horizontalDirection) + Math.abs(verticalDirection) > 1)  diagonalHinder = Math.SQRT2;
-        this.player.sprite.setVelocityX(this.playerSpeed * horizontalDirection / diagonalHinder);
-        this.player.sprite.setVelocityY(this.playerSpeed * verticalDirection / diagonalHinder);
+        if(Math.abs(horizontalDirection) + Math.abs(verticalDirection) > 0) {
+            this.player.sprite.setVelocityX(this.playerSpeed * horizontalDirection / diagonalHinder);
+            this.player.sprite.setVelocityY(this.playerSpeed * verticalDirection / diagonalHinder);
+        }
 
         // Attacks
         if(Phaser.Input.Keyboard.JustDown(this.space)) {
@@ -336,6 +356,12 @@ class MainGameScene extends Phaser.Scene {
                     console.log('4 Pressed');
                     digit = 4;
                     break;
+
+                case'Digit5':
+                case "Numpad5":
+                    console.log("5 Pressed");
+                    this.player.health = 0;
+                    break;
             }
             if(this.sidebarScene.pieces.length > digit-1) {
                 this.sidebarScene.pieces[digit-1].move();
@@ -356,38 +382,5 @@ class MainGameScene extends Phaser.Scene {
             }
         }
     }
-
-    // updateEnemies() {
-    //     this.enemies.children.iterate(this.enemyFindState);
-    //     this.enemies.children.iterate(function(child) {
-    //         switch(child.getData("state")) {
-    //             case "follow":
-    //                 this.physics.moveToObject(child, player, enemySpeed);
-    //                 break;
-    //
-    //             case "idle":
-    //                 child.setVelocity(0, 0);
-    //                 break;
-    //             case "attack":
-    //                 //enemyBasicAttack.call(this, child);
-    //                 child.setData("state", "afterAttack");
-    //                 child.setVelocity(0, 0);
-    //                 console.log("enemy in attack");
-    //                 break;
-    //             case "afterAttack":
-    //                 // After a bit, change back to idle
-    //                 let timedEvent = this.time.delayedCall(attackResetTime, function(enemy) {
-    //                     enemy.setData("state", "idle");
-    //                 }, [child], this);
-    //                 child.setData("state", "runAway");
-    //                 break;
-    //             case "runAway":
-    //                 let angle = Phaser.Math.Angle.BetweenPoints(player, child);
-    //                 //this.physics.velocityFromRotation(angle, enemySpeed);
-    //                 break;
-    //
-    //         }
-    //     }, this);
-    // }
 
 }
